@@ -1,16 +1,15 @@
-name: Angular CI
+name: Angular CI/CD
 
 on:
   push:
     branches:
       - main
 
-  pull_request:
-    branches:
-      - main
+permissions:
+  contents: write
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,4 +25,16 @@ jobs:
         run: npm ci
 
       - name: Build Angular Application
-        run: npm run build
+        run: npm run build -- --base-href=/angular-cicd-demo/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-build
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/CI_CD_Project/browser
